@@ -4,15 +4,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_shortcode( 'ufg', 'ufg_shortcode_callback' );
-
 function ufg_shortcode_callback( $atts ) {
 	ob_start();
 	/* print filters */
 	include_once 'filters.php';
 	include_once 'gallery.php';
 
-	/* echo "<hr>";
-	   defaults */
+	/* defaults */
 	$ufg_filters = array();
 	$ufg_gallery = array();
 
@@ -26,27 +24,7 @@ function ufg_shortcode_callback( $atts ) {
 		 /* loading saved settings and shortcode supported settings */
 		include 'setting.php';
 
-		/*
-		 echo "<pre>";
-		print_r($ufg_filters);
-		echo "</pre>";
-		echo "<hr>"; */
-
-		/*
-		 echo "<pre>";
-		print_r($ufg_gallery);
-		echo "</pre>";
-		echo "<hr>"; */
-
-		/*
-		 echo "<pre>";
-		print_r($ufg_setting);
-		echo count($ufg_setting);
-		echo "</pre>";
-		echo "<hr>"; */
-
-		/* load required resource 
-			CSS and JS */
+		/* load required resource CSS and JS */
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_style( 'ufg-bootstrap-frontend-css' );
 		wp_enqueue_style( 'ufg-fontawesome-css' );
@@ -78,8 +56,7 @@ function ufg_shortcode_callback( $atts ) {
 		</div>
 		<?php } ?>
 		<!-- printing filters end-->
-		
-		
+
 		<input id="ufg_current_clicked_filter_id" name="ufg_current_clicked_filter_id" value="" class="d-none" placeholder="Current Filter">
 		<input id="ufg_current_clicked_filter_level" name="ufg_current_clicked_filter_level" value="" class="d-none" placeholder="Current Level">
 		<input id="ufg_last_clicked_filter_id" name="ufg_last_clicked_filter_id" value="" class="d-none" placeholder="Last Filter">
@@ -88,9 +65,7 @@ function ufg_shortcode_callback( $atts ) {
 		<input id="ufg_last_clicked_filter_parent_id" name="ufg_last_clicked_filter_parent_id" value="" class="d-none" placeholder="Last Parent Filter">
 		
 		<!-- printing gallery start-->
-		<div class="row ufg-gallery">
-			<?php echo esc_html( ufg_gallery( $ufg_gallery_id, $ufg_gallery ) ); ?>
-		</div>
+		<div class="row ufg-gallery"><?php echo esc_html( ufg_gallery( $ufg_gallery_id, $ufg_gallery ) ); ?></div>
 		<!-- printing gallery end-->
 		
 		<style>

@@ -1,13 +1,16 @@
-=== WordPress Filter Gallery Plugin ===
-Contributors: FARAZFRANK
+=== Filter Gallery ===
+Contributors: awordpresslife, razipathhan, hanif0991, muhammadshahid, fkfaisalkhan007, sharikkhan007, zishlife, FARAZFRANK
 Tags: filter gallery, portfolio gallery, parent child filter, galería, 画廊
 Requires at least: 4.0
-Tested up to: 6.6.1
-Stable tag: 0.2.0
+Tested up to: 6.8
+Requires PHP: 7.0
+Stable tag: 0.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: filter-gallery
+Domain Path: /languages/
 
-Create portfolio gallery on website with responsive layout and fiters
+Create portfolio gallery on website with responsive layout and fitters
 
 == Description ==
 
@@ -172,6 +175,14 @@ Filter Gallery stands out as a valuable tool for website owners looking to eleva
 5. HD Wallpapers
 
 == Changelog ==
+
+= 0.2.2 =
+* security patched
+* update plugin accordingly guidelines
+
+= 0.2.1 =
+* Renamed plugin to comply with trademark policy
+* Tested with WordPress 6.8.1
 
 = 0.2.0 =
 * New plugins translation added

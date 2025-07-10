@@ -4,8 +4,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // CSS
-wp_enqueue_style( 'bootstrap-admin-css', plugins_url( 'assets/bootstrap-4.6.0/css/bootstrap-admin-min.css', __FILE__ ) );
-wp_enqueue_style( 'fontawesome-css', plugins_url( 'assets/fontawesome-free-5.3.1-web/css/all.min.css', __FILE__ ) );
+wp_enqueue_style( 'bootstrap-admin-css', plugins_url( 'assets/bootstrap-4.6.0/css/bootstrap-admin-min.css', __FILE__ ), array(), '4.0.6', 'all' );
+wp_enqueue_style( 'fontawesome-css', plugins_url( 'assets/fontawesome-free-5.3.1-web/css/all.min.css', __FILE__ ), array(), '5.3.1', 'all' );
 
 // get gallery details
 global $wpdb;
@@ -67,23 +67,23 @@ $ufg_last_version    = get_option( 'ufg_last_version' );
 							}
 							$ufg_gallery_shortcode = "[ufg id=$ufg_gallery_id]";
 							?>
-					<tr id="<?php echo esc_attr( $ufg_gallery_id ); ?>">
-						<th scope="row"><?php echo esc_html( $ufg_gallery_counter ); ?>.</th>
-						<td><?php echo esc_html( $ufg_gallery_name ); ?></td>
-						<td>
-							<input type="text" id="ufg-shortcode-<?php echo esc_attr( $ufg_gallery_id ); ?>" class="btn btn-info btn-sm" value="<?php echo esc_attr( $ufg_gallery_shortcode ); ?>">
-							<button type="button" id="ufg-shortcode-<?php echo esc_attr( $ufg_gallery_id ); ?>" class="btn btn-info btn-sm" title="<?php esc_html_e( 'Click To Copy Gallery Shortcode', 'ultimate-filter-gallery' ); ?>" onclick="return UFGCopyShortcode('<?php echo esc_attr( $ufg_gallery_id ); ?>');"><?php esc_html_e( 'Copy', 'ultimate-filter-gallery' ); ?></button>
-							<button class="btn btn-sm btn-light d-none ufg-copied-<?php echo esc_attr( $ufg_gallery_id ); ?>"><?php esc_html_e( 'Copied', 'ultimate-filter-gallery' ); ?></button>
-						</td>
-						<td>
-							<button type="button" id="ufg-clone" class="btn btn-warning btn-sm" title="<?php esc_html_e( 'Clone Gallery', 'ultimate-filter-gallery' ); ?>" value="<?php $ufg_gallery_id; ?>" onclick="return UFGCloneGallery('<?php echo esc_attr( $ufg_gallery_id ); ?>', '<?php echo esc_attr( $ufg_gallery_counter ); ?>');"><i class="fas fa-copy"></i></button>
-							<a href="?page=ufg-manage-gallery&id=<?php echo esc_attr( $ufg_gallery_id ); ?>&ufg-nonce=<?php echo esc_attr( wp_create_nonce( 'edit-gallery' )); ?>" class="btn btn-primary btn-sm" href="#"><i class="fas fa-edit"></i></a>
-							<button id="ufg-delete-gallery" class="btn btn-danger btn-sm" title="<?php esc_html_e( 'Delete Gallery', 'ultimate-filter-gallery' ); ?>" value="<?php echo esc_attr( $ufg_gallery_id ); ?>" onclick="return UFGRemoveGallery('<?php echo esc_attr( $ufg_gallery_id ); ?>', 'single');"><i class="fas fa-trash-alt"></i></button>
-						</td>
-						<td class="text-center">
-							<input type="checkbox" id="ufg-gallery-id" name="ufg-gallery-id" value="<?php echo esc_attr( $ufg_gallery_id ); ?>" title="<?php esc_html_e( 'Select Gallery', 'ultimate-filter-gallery' ); ?>">
-						</td>
-					</tr>
+							<tr id="<?php echo esc_attr( $ufg_gallery_id ); ?>">
+								<th scope="row"><?php echo esc_html( $ufg_gallery_counter ); ?>.</th>
+								<td><?php echo esc_html( $ufg_gallery_name ); ?></td>
+								<td>
+									<input type="text" id="ufg-shortcode-<?php echo esc_attr( $ufg_gallery_id ); ?>" class="btn btn-info btn-sm" value="<?php echo esc_attr( $ufg_gallery_shortcode ); ?>">
+									<button type="button" id="ufg-shortcode-<?php echo esc_attr( $ufg_gallery_id ); ?>" class="btn btn-info btn-sm" title="<?php esc_html_e( 'Click To Copy Gallery Shortcode', 'filter-gallery' ); ?>" onclick="return UFGCopyShortcode('<?php echo esc_attr( $ufg_gallery_id ); ?>');"><?php esc_html_e( 'Copy', 'filter-gallery' ); ?></button>
+									<button class="btn btn-sm btn-light d-none ufg-copied-<?php echo esc_attr( $ufg_gallery_id ); ?>"><?php esc_html_e( 'Copied', 'filter-gallery' ); ?></button>
+								</td>
+								<td>
+									<button type="button" id="ufg-clone" class="btn btn-warning btn-sm" title="<?php esc_html_e( 'Clone Gallery', 'filter-gallery' ); ?>" value="<?php $ufg_gallery_id; ?>" onclick="return UFGCloneGallery('<?php echo esc_attr( $ufg_gallery_id ); ?>', '<?php echo esc_attr( $ufg_gallery_counter ); ?>');"><i class="fas fa-copy"></i></button>
+									<a href="?page=ufg-manage-gallery&id=<?php echo esc_attr( $ufg_gallery_id ); ?>&ufg-nonce=<?php echo esc_attr( wp_create_nonce( 'edit-gallery' )); ?>" class="btn btn-primary btn-sm" href="#"><i class="fas fa-edit"></i></a>
+									<button id="ufg-delete-gallery" class="btn btn-danger btn-sm" title="<?php esc_html_e( 'Delete Gallery', 'filter-gallery' ); ?>" value="<?php echo esc_attr( $ufg_gallery_id ); ?>" onclick="return UFGRemoveGallery('<?php echo esc_attr( $ufg_gallery_id ); ?>', 'single');"><i class="fas fa-trash-alt"></i></button>
+								</td>
+								<td class="text-center">
+									<input type="checkbox" id="ufg-gallery-id" name="ufg-gallery-id" value="<?php echo esc_attr( $ufg_gallery_id ); ?>" title="<?php esc_html_e( 'Select Gallery', 'filter-gallery' ); ?>">
+								</td>
+							</tr>
 							<?php
 							$ufg_gallery_counter++;
 						} // end of for each
@@ -96,7 +96,7 @@ $ufg_last_version    = get_option( 'ufg_last_version' );
 					<th scope="col"><?php esc_html_e( 'Title', 'filter-gallery' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Shortcode', 'filter-gallery' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Actions', 'filter-gallery' ); ?></th>
-					<th scope="col" class="text-center"><button type="button" id="ufg-delete-selected" class="btn btn-danger btn-sm" title="<?php esc_html_e( 'Delete Selected Gallery', 'ultimate-filter-gallery' ); ?>" onclick="return UFGRemoveGallery('', 'multiple');"><i class="fas fa-trash-alt"></i></button></th>
+					<th scope="col" class="text-center"><button type="button" id="ufg-delete-selected" class="btn btn-danger btn-sm" title="<?php esc_html_e( 'Delete Selected Gallery', 'filter-gallery' ); ?>" onclick="return UFGRemoveGallery('', 'multiple');"><i class="fas fa-trash-alt"></i></button></th>
 					</tr>
 				</thead>
 			</table>
@@ -104,13 +104,6 @@ $ufg_last_version    = get_option( 'ufg_last_version' );
 	</div>
 </div>
 <script>
-/* jQuery(document).ready(function(){
-	//tooltip
-	jQuery('.settings-info').tooltip({trigger: "click"});
-	//modal
-	var ufg_gallery = new bootstrap.Modal(document.getElementById('ufg_gallery'), { });
-}); */
-
 // copy shortcode to clipboard
 function UFGCopyShortcode(id) {
 	/* Get the text field */
@@ -157,25 +150,36 @@ jQuery("#ufg-select-all").click(function () {
 // remove gallery/galleries start
 function UFGRemoveGallery(ufg_gallery_id, do_action){
 	console.log(ufg_gallery_id);
-	if(do_action == 'multiple'){
+	console.log(do_action);
+	if(do_action == 'multiple' && confirm("Are you sure to delete seleted gallery?")){
 		var ufg_gallery_id = [];
-		if(confirm("Are you sure to delete seleted gallery?")){
-			jQuery("input:checkbox[name=ufg-gallery-id]:checked").each(function() { 
+			jQuery("input:checkbox[name=ufg-gallery-id]:checked").each(function() {
 				ufg_gallery_id.push(jQuery(this).val());
-				
+				console.log(ufg_gallery_id);
 				//hide selected table row on multiple gallery delete
 				jQuery("tr#" + jQuery(this).val()).fadeOut('1500');
-				//delay after fadeOut table row
-				jQuery(function() {
-					setTimeout(function() {
-						jQuery("tr#" + jQuery(this).val()).remove();
-					}, 1000);
-				});
 			});
-		}
+			jQuery.ajax({
+				type: 'POST',
+				url: "<?php echo esc_js(admin_url( 'admin-ajax.php' )); ?>",
+				data: {
+					'action': 'ufg_remove_gallery', //this is the name of the AJAX method called in WordPress
+					'do_action': do_action, //this is the name of the AJAX method called in WordPress
+					'nonce': "<?php echo esc_js( wp_create_nonce( 'ufg-remove-gallery' )); ?>",
+					//slider info
+					'ufg_gallery_id': ufg_gallery_id,
+				}, 
+				success: function (result) {
+					//hide table row on slide slider delete
+					
+				},
+				error: function () {
+					//alert("error");
+				}
+			});
 	}
 	
-	if(do_action != 'multiple' && confirm("Are you sure to delete gallery?")){
+	if(do_action == 'single' && confirm("Are you sure to delete gallery?")){
 		jQuery.ajax({
 			type: 'POST',
 			url: "<?php echo esc_js(admin_url( 'admin-ajax.php' )); ?>",
@@ -188,16 +192,12 @@ function UFGRemoveGallery(ufg_gallery_id, do_action){
 			}, 
 			success: function (result) {
 				//hide table row on slide slider delete
-				if(do_action == 'single'){
-					jQuery("tr#" + ufg_gallery_id).fadeOut('1500');
-					
-					//delay after fadeOut table row
-					jQuery(function() {
-						setTimeout(function() {
-							jQuery("tr#" + ufg_gallery_id).remove();
-						}, 1000);
-					});
-				}
+				jQuery("tr#" + ufg_gallery_id).fadeOut('1500');
+				jQuery(function() {
+					setTimeout(function() {
+						jQuery("tr#" + ufg_gallery_id).remove();
+					}, 1000);
+				});
 			},
 			error: function () {
 				//alert("error");

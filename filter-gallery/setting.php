@@ -333,4 +333,3 @@ if ( isset( $atts['lightbox_title'] ) ) {
 		$ufg_lightbox_title = 1; /* default */
 	}
 }
-

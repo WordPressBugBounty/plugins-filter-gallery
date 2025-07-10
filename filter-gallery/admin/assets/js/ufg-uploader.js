@@ -76,11 +76,14 @@ jQuery(
 				cb                 = cb || function() {
 				};
 				var ufg_gallery_id = jQuery( "#ufg-gallery-id" ).val();
-				console.log( ufg_gallery_id );
+				var ufg_li_generate_nonce = jQuery( "#ufg_li_generate_nonce" ).val();
+				//console.log( ufg_gallery_id );
+				//console.log( ufg_li_generate_nonce );
 				var data = {
 					action: 'ufg_image_id',
 					attachment_id: id,
 					ufg_gallery_id: ufg_gallery_id,
+					nonce: ufg_li_generate_nonce,
 				};
 				jQuery.post(
 					ajaxurl,

@@ -4,13 +4,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Plugin Name:       Filter Gallery - 0.2.0
+ * Plugin Name:       Filter Gallery
  * Plugin URI:        https://wpfrank.com/
  * Description:       Create portfolio gallery on website with responsive layout and fiters
- * Version:           0.2.0
+ * Version:           0.2.2
  * Requires at least: 4.0
  * Requires PHP:      4.0
- * Author:            FARAZFRANK
+ * Author:            farazfrank
  * Author URI:        https://profiles.wordpress.org/farazfrank/
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -101,7 +101,7 @@ function ufg_manage_gallery(){
 	require 'admin/manage-gallery.php';
 }
 
-//get / create next gallery id
+// create next gallery id
 function ufg_get_next_id(){
 	global $wpdb;
 	$ufg_gallery_key = "ufg_gallery_";
@@ -123,14 +123,16 @@ function ufg_get_next_id(){
 // 1. save filters ajax
 function ufg_gallery_filters_callback(){
 	if ( current_user_can( 'manage_options' ) ) {
-		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'add-filters' ) ) {
+		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'add-filters' ) ) {
 			// save filters
 			//print_r($_POST);
 			$filters = array();
-			$ufg_gallery_id = sanitize_text_field(($_POST['id']));
-			$ufg_gallery_name = sanitize_text_field($_POST['gallery_name']);
-			$filters = json_decode(stripslashes($_POST['filters']));
-
+			
+			$ufg_gallery_id = (isset($_POST['id'])) ? sanitize_text_field( wp_unslash ($_POST['id'] ) ) : '';
+			$ufg_gallery_name = (isset($_POST['gallery_name'])) ? sanitize_text_field( wp_unslash ($_POST['gallery_name'] ) ) : '';
+			$filters_data = isset($_POST['filters']) ? wp_kses_post(wp_unslash($_POST['filters'])) : '';
+			$filters = json_decode($filters_data);
+			
 			/* echo "<pre>";
 			print_r($filters);
 			echo "</pre>"; */
@@ -148,14 +150,13 @@ function ufg_gallery_filters_callback(){
 						unset($filters[$filters_key]);
 					}
 				}
-				// array_values will recreate all filter index value in assanding order after unsetting blank filters
+				// array_values will recreate all filter index value in as sanding order after unsetting blank filters
 				$filters = array_values($filters);
 				
 				//make unique filters
 				foreach($filters as $filters_key => $filters_value ){
 					$parent_filters = sanitize_text_field($filters[$filters_key]->title);
 					$parent_filters_text = sanitize_text_field($filters[$filters_key]->text); // this will be unique all time
-					//$filters[$filters_key]->title = $parent_filters."-".$filters_key; // it was adding key again and again
 					
 					// adding index value at the end of text to make it unique and same name filter can be possible
 					$filters[$filters_key]->title = $parent_filters_text."-".$filters_key;
@@ -179,88 +180,76 @@ add_action( 'wp_ajax_ufg_gallery_filters', 'ufg_gallery_filters_callback' );
 
 // 2. add images to the gallery
 function ufg_li_generate_ajax_callback() {
-	if ( isset($_POST['attachment_id']) && isset($_POST['ufg_gallery_id']) ) {
-		wp_enqueue_script( 'ufg-uploader-js', plugins_url( 'assets/js/ufg-uploader.js', __FILE__ ), array('jquery'), '1.10.0' );
+	if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'ufg-li-generate' ) ) {
+		if ( isset($_POST['attachment_id']) && isset($_POST['ufg_gallery_id']) ) {
+			wp_enqueue_script( 'ufg-uploader-js', plugins_url( 'assets/js/ufg-uploader.js', __FILE__ ), array('jquery'), '1.10.0', true );
 
-		//defaults
-		$ufg_title = $ufg_alt = $ufg_description = $ufg_url = "";
-		//load values
-		$ufg_attachment_id = sanitize_text_field($_POST['attachment_id']);
-		$ufg_title = get_the_title($ufg_attachment_id);
-		$ufg_alt = get_post_meta($ufg_attachment_id, '_wp_attachment_image_alt', TRUE);
-		//wp_get_attachment_image_src ( int $ufg_attachment_id, string|array $size = 'thumbnail', bool $icon = false )
-		//thumb, thumbnail, medium, large, post-thumbnail
-		$medium = wp_get_attachment_image_src($ufg_attachment_id, 'medium', true); // attachment medium URL
-		$attachment = get_post( $ufg_attachment_id );
-		$ufg_description = $attachment->post_content; // attachment description
-		//get saved filters
-		$ufg_gallery_id = sanitize_text_field($_POST['ufg_gallery_id']);
-		$filters = get_option("ufg_filters_".$ufg_gallery_id);
-		?>
-		<script>
-		jQuery(document).ready(function () {
-			jQuery(function(jQuery) {
-				jQuery('.ufg-image-filters').multiselect({
-					buttonWidth: '100%',
-					enableFiltering: true,
-					nonSelectedText: "<?php esc_html_e( 'Select Filters', 'filter-gallery' ); ?>"
+			//defaults
+			$ufg_title = $ufg_alt = $ufg_description = $ufg_url = "";
+			//load values
+			$ufg_attachment_id = sanitize_text_field(wp_unslash($_POST['attachment_id']));
+			$ufg_title = get_the_title($ufg_attachment_id);
+			$ufg_alt = get_post_meta($ufg_attachment_id, '_wp_attachment_image_alt', TRUE);
+			//wp_get_attachment_image_src ( int $ufg_attachment_id, string|array $size = 'thumbnail', bool $icon = false )
+			//thumb, thumbnail, medium, large, post-thumbnail
+			$medium = wp_get_attachment_image_src($ufg_attachment_id, 'medium', true); // attachment medium URL
+			$attachment = get_post( $ufg_attachment_id );
+			$ufg_description = $attachment->post_content; // attachment description
+			//get saved filters
+			$ufg_gallery_id = sanitize_text_field(wp_unslash($_POST['ufg_gallery_id']));
+			$filters = get_option("ufg_filters_".$ufg_gallery_id);
+			?>
+			<script>
+			jQuery(document).ready(function () {
+				jQuery(function(jQuery) {
+					jQuery('.ufg-image-filters').multiselect({
+						buttonWidth: '100%',
+						enableFiltering: true,
+						nonSelectedText: "<?php esc_html_e( 'Select Filters', 'filter-gallery' ); ?>"
+					});
 				});
 			});
-		});
-		</script>
-		<li class="col-md-2 border border-dark rounded-lg bg-light p-2 m-4 ufg-image-<?php echo esc_attr($ufg_attachment_id); ?>" data-position="<?php echo esc_attr($ufg_attachment_id); ?>">
-			<div class="form-group">
-				<input type="hidden" class="form-control ufg-attachment-id" id="ufg-attachment-id" name="ufg-attachment-id[<?php echo esc_attr($ufg_attachment_id); ?>]" value="<?php echo esc_attr($ufg_attachment_id); ?>">
-				<img src="<?php echo esc_url($medium[0]); ?>" class="card-img-top" width="150px" height="150px">
-				<span class="badge badge-primary">Image ID: <?php echo esc_attr($ufg_attachment_id); ?></span>
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control ufg-title" id="ufg-title" name="ufg-title[<?php echo esc_attr($ufg_attachment_id); ?>]" value="<?php echo esc_attr($ufg_title); ?>" placeholder="<?php esc_html_e( 'Image Title', 'filter-gallery' ); ?>">
-			</div>
-			<div class="form-group">
-				<input type="text" class="form-control ufg-alt" id="ufg-alt" name="ufg-alt[<?php echo esc_attr($ufg_attachment_id); ?>]" value="<?php echo esc_attr($ufg_alt); ?>" placeholder="<?php esc_html_e( 'Image Alternative Text', 'filter-gallery' ); ?>">
-			</div>
-			<div class="form-group">
-				<?php
-				$ufg_get_filter_list_results = ufg_get_filter_list($ufg_attachment_id, $filters, array());
-				$ufg_get_filter_list_allowed = array(
-					'select' => array( 'id' => array(), 'name' => array(), 'class' => array(), 'data-max' => array(), 'multiple' => array() ),
-					'option' => array ( 'value' => array(), 'selected' => array()),
-				);
-				echo wp_kses($ufg_get_filter_list_results, $ufg_get_filter_list_allowed);
-				?>
-			</div>
-			<div class="form-group text-center">
-				<button type="button" id="ufg-remove-image" onclick="return removeImage('<?php echo esc_attr($ufg_attachment_id); ?>');" class="btn btn-sm btn-danger"><?php esc_html_e( 'Remove', 'filter-gallery' ); ?></button>
-			</div>
-		</li>
-		<?php
-		wp_die(); // this is required to terminate immediately and return a proper response
+			</script>
+			<li class="col-md-2 border border-dark rounded-lg bg-light p-2 m-4 ufg-image-<?php echo esc_attr($ufg_attachment_id); ?>" data-position="<?php echo esc_attr($ufg_attachment_id); ?>">
+				<div class="form-group">
+					<input type="hidden" class="form-control ufg-attachment-id" id="ufg-attachment-id" name="ufg-attachment-id[<?php echo esc_attr($ufg_attachment_id); ?>]" value="<?php echo esc_attr($ufg_attachment_id); ?>">
+					<img src="<?php echo esc_url($medium[0]); ?>" class="card-img-top" width="150px" height="150px">
+					<span class="badge badge-primary">Image ID: <?php echo esc_attr($ufg_attachment_id); ?></span>
+				</div>
+				<div class="form-group">
+					<input type="text" class="form-control ufg-title" id="ufg-title" name="ufg-title[<?php echo esc_attr($ufg_attachment_id); ?>]" value="<?php echo esc_attr($ufg_title); ?>" placeholder="<?php esc_html_e( 'Image Title', 'filter-gallery' ); ?>">
+				</div>
+				<div class="form-group">
+					<input type="text" class="form-control ufg-alt" id="ufg-alt" name="ufg-alt[<?php echo esc_attr($ufg_attachment_id); ?>]" value="<?php echo esc_attr($ufg_alt); ?>" placeholder="<?php esc_html_e( 'Image Alternative Text', 'filter-gallery' ); ?>">
+				</div>
+				<div class="form-group">
+					<?php
+					$ufg_get_filter_list_results = ufg_get_filter_list($ufg_attachment_id, $filters, array());
+					$ufg_get_filter_list_allowed = array(
+						'select' => array( 'id' => array(), 'name' => array(), 'class' => array(), 'data-max' => array(), 'multiple' => array() ),
+						'option' => array ( 'value' => array(), 'selected' => array()),
+					);
+					echo wp_kses($ufg_get_filter_list_results, $ufg_get_filter_list_allowed);
+					?>
+				</div>
+				<div class="form-group text-center">
+					<button type="button" id="ufg-remove-image" onclick="return removeImage('<?php echo esc_attr($ufg_attachment_id); ?>');" class="btn btn-sm btn-danger"><?php esc_html_e( 'Remove', 'filter-gallery' ); ?></button>
+				</div>
+			</li>
+			<?php
+			wp_die(); // this is required to terminate immediately and return a proper response
+		}
 	}
 }
 add_action( 'wp_ajax_ufg_image_id', 'ufg_li_generate_ajax_callback' );
 
 // generate filter select list
 function ufg_get_filter_list($ufg_attachment_id, $filters, $selected_filters){
-	/* echo "<pre>";
-	print_r($filters);
-	echo "</pre>"; */
-	
-	/* echo "<pre>";
-	print_r($selected_filters);
-	echo "</pre>"; */
-	
 	$ufg_filters_list = "";
 	if(is_array($filters) && $filters_count = count($filters)) {
 		$ufg_filters_list .= '<select id="ufg-image-filters" name="ufg-image-filters['.$ufg_attachment_id.'][]" class="ufg-image-filters" data-max="" multiple="multiple">';
 		$filters_count_end = 4; // for free
 		if($filters_count < $filters_count_end) $filters_count_end = $filters_count;
-		/* for($i = 0; $i <= $filters_count_end; $i++){
-			$text_zero = sanitize_text_field($filters[$i]->text);
-			$value_zero = str_replace(" ","-", strtolower($filters[$i]->title));
-			if(in_array($value_zero, $selected_filters) === TRUE) $selected = "selected=selected"; else $selected = "";
-			if($text_zero != "") $ufg_filters_list .= "<option value='$value_zero' $selected>$text_zero</option>";
-		} */
 		foreach($filters as $filters_key => $filters_value){
 			$text_zero = sanitize_text_field($filters[$filters_key]->text);
 			$value_zero = str_replace(" ","-", strtolower($filters[$filters_key]->title));
@@ -275,41 +264,35 @@ function ufg_get_filter_list($ufg_attachment_id, $filters, $selected_filters){
 // 3. save gallery images
 function ufg_save_gallery_callback(){
 	if ( current_user_can( 'manage_options' ) ) {
-		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'save-gallery' ) ) {
+		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'save-gallery' ) ) {
 			// defaults
-			$ufg_gallery_id = sanitize_text_field($_POST['id']);
-			$ufg_image_id = $ufg_image_title = $ufg_image_alt = $ufg_image_filters = $ufg_gallery = array();
+			$ufg_gallery_id = (isset($_POST['id'])) ? sanitize_text_field( wp_unslash ($_POST['id'] ) ) : '';
+			$ufg_image_id = $ufg_image_title = $ufg_image_alt = $ufg_image_filters = $ufg_gallery = [];
+			
+			// Parse and sanitize POST data
+			if (isset($_POST['image_id'])) {
+				parse_str(urldecode_deep($_POST['image_id']), $ufg_image_id);
+				$ufg_image_id = map_deep($ufg_image_id, 'sanitize_text_field');
+			}
+			if (isset($_POST['image_title'])) {
+				parse_str(urldecode_deep($_POST['image_title']), $ufg_image_title);
+				$ufg_image_title = map_deep($ufg_image_title, 'sanitize_text_field');
+			}
+			if (isset($_POST['image_alt'])) {
+				parse_str(urldecode_deep($_POST['image_alt']), $ufg_image_alt);
+				$ufg_image_alt = map_deep($ufg_image_alt, 'sanitize_text_field');
+			}
+			if (isset($_POST['image_filters'])) {
+				parse_str(urldecode_deep($_POST['image_filters']), $ufg_image_filters);
+				$ufg_image_filters = map_deep($ufg_image_filters, 'sanitize_text_field');
+			}
 			
 			/* echo "<pre>";
-			echo "posted <br>";
-			print_r($_POST['image_id']);
-			echo "<hr>";
-			$ufg_image_id = $_POST['image_id'];
-			
-			echo "url decode <br>";
-			print_r($ufg_image_id = urldecode_deep($ufg_image_id));
-			echo "<hr>";
-			
-			echo "parsed <br>";
-			parse_str($ufg_image_id, $ufg_image_id);
 			print_r($ufg_image_id);
-			echo "<hr>";
-			
-			echo "sanitize <br>";
-			print_r(sanitize_text_field($ufg_image_id));
+			print_r($ufg_image_title);
+			print_r($ufg_image_alt);
+			print_r($ufg_image_filters);
 			echo "</pre>"; */
-			
-			// decode URL string and parse and sanitize
-			sanitize_text_field(parse_str(urldecode_deep($_POST['image_id']), $ufg_image_id));
-			sanitize_text_field(parse_str(urldecode_deep($_POST['image_title']), $ufg_image_title));
-			sanitize_text_field(parse_str(urldecode_deep($_POST['image_alt']), $ufg_image_alt));
-			sanitize_text_field(parse_str(urldecode_deep($_POST['image_filters']), $ufg_image_filters));
-			
-			// sanitize each array keys via array_map
-			isset( $_POST['image_id'] ) ? (array) array_map('sanitize_text_field', $ufg_image_id) : array();
-			isset( $_POST['image_title'] ) ? (array) array_map('sanitize_text_field', $ufg_image_title) : array();
-			isset( $_POST['image_alt'] ) ? (array) array_map('sanitize_text_field', $ufg_image_alt) : array();
-			isset( $_POST['image_filters'] ) ? (array) array_map('sanitize_text_field', $ufg_image_filters) : array();
 			
 			// save gallery
 			//update attachment meta - title, alt, description
@@ -341,10 +324,10 @@ add_action( 'wp_ajax_ufg_save_gallery', 'ufg_save_gallery_callback' );
 // 4. load gallery images
 function ufg_load_gallery_callback($ufg_gallery_id){
 	if ( current_user_can( 'manage_options' ) ) {
-		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'load-gallery' ) ) {
+		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'load-gallery' ) ) {
 			//get / create next gallery id
 			if(isset($_POST['id'])){
-				$ufg_gallery_id = sanitize_text_field($_POST['id']); 
+				$ufg_gallery_id = (isset($_POST['id'])) ? sanitize_text_field( wp_unslash ($_POST['id'] ) ) : '';
 				
 				// load filters and gallery options
 				$ufg_filters = get_option("ufg_filters_".$ufg_gallery_id);
@@ -431,40 +414,65 @@ add_action( 'wp_ajax_ufg_load_gallery', 'ufg_load_gallery_callback' );
 // 5. save gallery settings
 function ufg_save_setting_callback(){
 	if ( current_user_can( 'manage_options' ) ) {
-		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'save-setting' ) ) {
-			$ufg_gallery_id = sanitize_text_field($_POST['ufg_gallery_id']);
+		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'save-setting' ) ) {
+			$ufg_gallery_id = (isset($_POST['ufg_gallery_id'])) ? sanitize_text_field( wp_unslash ($_POST['ufg_gallery_id'] ) ) : '';
+			$show_filters = (isset($_POST['show_filters'])) ? sanitize_text_field( wp_unslash ($_POST['show_filters'] ) ) : '';
+			$show_all_button = (isset($_POST['show_all_button'])) ? sanitize_text_field( wp_unslash ($_POST['show_all_button'] ) ) : '';
+			$all_button_text = (isset($_POST['all_button_text'])) ? sanitize_text_field( wp_unslash ($_POST['all_button_text'] ) ) : '';
+			$all_button_color = (isset($_POST['all_button_color'])) ? sanitize_text_field( wp_unslash ($_POST['all_button_color'] ) ) : '';
+			$all_button_bg_color = (isset($_POST['all_button_bg_color'])) ? sanitize_text_field( wp_unslash ($_POST['all_button_bg_color'] ) ) : '';
+			$parent_button_color = (isset($_POST['parent_button_color'])) ? sanitize_text_field( wp_unslash ($_POST['parent_button_color'] ) ) : '';
+			$parent_button_bg_color = (isset($_POST['parent_button_bg_color'])) ? sanitize_text_field( wp_unslash ($_POST['parent_button_bg_color'] ) ) : '';
+			
+			$columns_desktop = (isset($_POST['columns_desktop'])) ? sanitize_text_field( wp_unslash ($_POST['columns_desktop'] ) ) : '';
+			$columns_tab = (isset($_POST['columns_tab'])) ? sanitize_text_field( wp_unslash ($_POST['columns_tab'] ) ) : '';
+			$columns_mobile_landscape = (isset($_POST['columns_mobile_landscape'])) ? sanitize_text_field( wp_unslash ($_POST['columns_mobile_landscape'] ) ) : '';
+			$columns_mobile_portrait = (isset($_POST['columns_mobile_portrait'])) ? sanitize_text_field( wp_unslash ($_POST['columns_mobile_portrait'] ) ) : '';
+			$thumbnail_image_size = (isset($_POST['thumbnail_image_size'])) ? sanitize_text_field( wp_unslash ($_POST['thumbnail_image_size'] ) ) : '';
+			$thumbnail_border = (isset($_POST['thumbnail_border'])) ? sanitize_text_field( wp_unslash ($_POST['thumbnail_border'] ) ) : '';
+			$thumbnail_border_thickness = (isset($_POST['thumbnail_border_thickness'])) ? sanitize_text_field( wp_unslash ($_POST['thumbnail_border_thickness'] ) ) : '';
+			$thumbnail_border_color = (isset($_POST['thumbnail_border_color'])) ? sanitize_text_field( wp_unslash ($_POST['thumbnail_border_color'] ) ) : '';
+			$image_title = (isset($_POST['image_title'])) ? sanitize_text_field( wp_unslash ($_POST['image_title'] ) ) : '';
+			$image_title_font_size = (isset($_POST['image_title_font_size'])) ? sanitize_text_field( wp_unslash ($_POST['image_title_font_size'] ) ) : '';
+			$image_title_color = (isset($_POST['image_title_color'])) ? sanitize_text_field( wp_unslash ($_POST['image_title_color'] ) ) : '';
+			$image_title_bg_color = (isset($_POST['image_title_bg_color'])) ? sanitize_text_field( wp_unslash ($_POST['image_title_bg_color'] ) ) : '';
+			$image_sorting = (isset($_POST['image_sorting'])) ? sanitize_text_field( wp_unslash ($_POST['image_sorting'] ) ) : '';
+			$custom_css = (isset($_POST['custom_css'])) ? sanitize_text_field( wp_unslash ($_POST['custom_css'] ) ) : '';
+			
+			$lightbox = (isset($_POST['lightbox'])) ? sanitize_text_field( wp_unslash ($_POST['lightbox'] ) ) : '';
+			$lightbox_title = (isset($_POST['lightbox_title'])) ? sanitize_text_field( wp_unslash ($_POST['lightbox_title'] ) ) : '';
 			$settings = array(
 				//gallery details
-				'ufg_gallery_id' => sanitize_text_field($_POST['ufg_gallery_id']),
+				'ufg_gallery_id' => $ufg_gallery_id,
 				
 				//filters settings
-				'show_filters' => sanitize_text_field($_POST['show_filters']),
-				'show_all_button' => sanitize_text_field($_POST['show_all_button']),
-				'all_button_text' => sanitize_text_field($_POST['all_button_text']),
-				'all_button_color' => sanitize_text_field($_POST['all_button_color']),
-				'all_button_bg_color' => sanitize_text_field($_POST['all_button_bg_color']),
-				'parent_button_color' => sanitize_text_field($_POST['parent_button_color']),
-				'parent_button_bg_color' => sanitize_text_field($_POST['parent_button_bg_color']),
+				'show_filters' => $show_filters,
+				'show_all_button' => $show_all_button,
+				'all_button_text' => $all_button_text,
+				'all_button_color' => $all_button_color,
+				'all_button_bg_color' => $all_button_bg_color,
+				'parent_button_color' => $parent_button_color,
+				'parent_button_bg_color' => $parent_button_bg_color,
 				
 				//gallery settings
-				'columns_desktop' => sanitize_text_field($_POST['columns_desktop']),
-				'columns_tab' => sanitize_text_field($_POST['columns_tab']),
-				'columns_mobile_landscape' => sanitize_text_field($_POST['columns_mobile_landscape']),
-				'columns_mobile_portrait' => sanitize_text_field($_POST['columns_mobile_portrait']),
-				'thumbnail_image_size' => sanitize_text_field($_POST['thumbnail_image_size']),
-				'thumbnail_border' => sanitize_text_field($_POST['thumbnail_border']),
-				'thumbnail_border_thickness' => sanitize_text_field($_POST['thumbnail_border_thickness']),
-				'thumbnail_border_color' => sanitize_text_field($_POST['thumbnail_border_color']),
-				'image_title' => sanitize_text_field($_POST['image_title']),
-				'image_title_font_size' => sanitize_text_field($_POST['image_title_font_size']),
-				'image_title_color' => sanitize_text_field($_POST['image_title_color']),
-				'image_title_bg_color' => sanitize_text_field($_POST['image_title_bg_color']),
-				'image_sorting' => sanitize_text_field($_POST['image_sorting']),
-				'custom_css' => sanitize_text_field($_POST['custom_css']),
+				'columns_desktop' => $columns_desktop,
+				'columns_tab' => $columns_tab,
+				'columns_mobile_landscape' => $columns_mobile_landscape,
+				'columns_mobile_portrait' => $columns_mobile_portrait,
+				'thumbnail_image_size' => $thumbnail_image_size,
+				'thumbnail_border' => $thumbnail_border,
+				'thumbnail_border_thickness' => $thumbnail_border_thickness,
+				'thumbnail_border_color' => $thumbnail_border_color,
+				'image_title' => $image_title,
+				'image_title_font_size' => $image_title_font_size,
+				'image_title_color' => $image_title_color,
+				'image_title_bg_color' => $image_title_bg_color,
+				'image_sorting' => $image_sorting,
+				'custom_css' => $custom_css,
 
 				//lightbox settings
-				'lightbox' => sanitize_text_field($_POST['lightbox']),
-				'lightbox_title' => sanitize_text_field($_POST['lightbox_title']),
+				'lightbox' => $lightbox,
+				'lightbox_title' => $lightbox_title,
 			);
 			update_option("ufg_settings_".$ufg_gallery_id, $settings);
 			die;
@@ -478,23 +486,22 @@ add_action( 'wp_ajax_ufg_save_setting', 'ufg_save_setting_callback' );
 /* 6. remove gallery/galleries start */
 function ufg_remove_gallery_callback() {
 	if ( current_user_can( 'manage_options' ) ) {
-		if ( $_POST['nonce'] && wp_verify_nonce( $_POST['nonce'], 'ufg-remove-gallery' ) ) {
-			/* verified action */
+		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'ufg-remove-gallery' ) ) {
 			if(isset($_POST['ufg_gallery_id']) && isset($_POST['do_action'])){
-				
-				$ufg_gallery_id = $_POST['ufg_gallery_id'];
-				$ufg_do_action = sanitize_text_field($_POST['do_action']);
 
-				/* single gallery delete. */
+				$ufg_do_action = sanitize_text_field(wp_unslash($_POST['do_action']));
+				/* single gallery delete */
 				if ( $ufg_do_action == 'single' ) {
+					$ufg_gallery_id = sanitize_text_field(wp_unslash($_POST['ufg_gallery_id']));
 					delete_option( 'ufg_filters_' . $ufg_gallery_id );
 					delete_option( 'ufg_gallery_' . $ufg_gallery_id );
 					delete_option( 'ufg_settings_' . $ufg_gallery_id );
 				}
 
-				/* multiple gallery delete. */
+				/* multiple gallery delete via array */
 				if ( $ufg_do_action == 'multiple' ) {
-					foreach ( $ufg_gallery_id as $ufg_single_id ) {
+					$ufg_gallery_ids = map_deep(wp_unslash($_POST['ufg_gallery_id']), 'sanitize_text_field');
+					foreach ( $ufg_gallery_ids as $ufg_single_id ) {
 						delete_option( 'ufg_filters_' . $ufg_single_id );
 						delete_option( 'ufg_gallery_' . $ufg_single_id );
 						delete_option( 'ufg_settings_' . $ufg_single_id );
@@ -514,11 +521,11 @@ add_action( 'wp_ajax_ufg_remove_gallery', 'ufg_remove_gallery_callback' );
 // 7. clone gallery start
 function ufg_clone_gallery_callback(){
 	if ( current_user_can( 'manage_options' ) ) {
-		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'ufg-clone-gallery' ) ) {
+		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'ufg-clone-gallery' ) ) {
 			// verified action
 			if(isset( $_POST['ufg_gallery_id'] ) && isset( $_POST['ufg_gallery_counter'] )){
-				$ufg_gallery_id = sanitize_text_field($_POST['ufg_gallery_id']);
-				$ufg_gallery_counter = sanitize_text_field($_POST['ufg_gallery_counter']);
+				$ufg_gallery_id = (isset($_POST['id'])) ? sanitize_text_field( wp_unslash ($_POST['id'] ) ) : '';
+				$ufg_gallery_counter = (isset($_POST['ufg_gallery_counter'])) ? sanitize_text_field( wp_unslash ($_POST['ufg_gallery_counter'] ) ) : '';
 
 				//get cloning gallery data
 				$ufg_cloning_filters = get_option("ufg_filters_".$ufg_gallery_id);
@@ -580,11 +587,11 @@ add_action( 'wp_ajax_ufg_clone_gallery', 'ufg_clone_gallery_callback' );
 // register sf scripts
 function ufg_register_scripts(){
 	wp_enqueue_script('jquery');
-	wp_register_style( 'ufg-bootstrap-frontend-css', plugin_dir_url(__FILE__).'admin/assets/bootstrap-4.6.0/css/ufg-bootstrap-frontend-min.css');
-	wp_register_style( 'ufg-fontawesome-css', plugin_dir_url(__FILE__). 'admin/assets/fontawesome-free-5.3.1-web/css/all.min.css');
+	wp_register_style( 'ufg-bootstrap-frontend-css', plugin_dir_url(__FILE__).'admin/assets/bootstrap-4.6.0/css/ufg-bootstrap-frontend-min.css', array(), '4.6.0', 'all');
+	wp_register_style( 'ufg-fontawesome-css', plugin_dir_url(__FILE__). 'admin/assets/fontawesome-free-5.3.1-web/css/all.min.css', array(), '5.3.1', 'all');
 	//lightbox JS and CSS
-	wp_register_style( 'ufg-lightbox-css', plugin_dir_url(__FILE__). 'admin/assets/lightbox/lokesh/css/lightbox.css');
-	wp_register_script( 'ufg-lightbox-js', plugin_dir_url(__FILE__). 'admin/assets/lightbox/lokesh/js/lightbox.js', array('jquery'), '4.5.2' );
+	wp_register_style( 'ufg-lightbox-css', plugin_dir_url(__FILE__). 'admin/assets/lightbox/lokesh/css/lightbox.css', array(), '2.11.2', 'all');
+	wp_register_script( 'ufg-lightbox-js', plugin_dir_url(__FILE__). 'admin/assets/lightbox/lokesh/js/lightbox.js', array('jquery'), '4.5.2', true );
 }
 add_action( 'wp_enqueue_scripts', 'ufg_register_scripts' );
 
@@ -691,10 +698,9 @@ function ufg_pro_details(){
 					</div>
 				</div>
 			</div>
-			
 		</div>
 	</div>
 	<?php
 	}
 }
-add_action('in_admin_header','ufg_pro_details'); 
+add_action('in_admin_header','ufg_pro_details');

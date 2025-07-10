@@ -39,9 +39,7 @@ function ufg_gallery( $ufg_gallery_id, $ufg_gallery ) {
 			} else {
 				$filters = array();
 			}
-			/* print_r(implode(", ",$filters)); */
 			?>
-			
 			<div id="ufg-thumbnail" class="col-<?php echo esc_attr( $ufg_columns_mobile_portrait ); ?> col-sm-<?php echo esc_attr( $ufg_columns_mobile_landscape ); ?> col-md-<?php echo esc_attr( $ufg_columns_tab ); ?> col-lg-<?php echo esc_attr( $ufg_columns_desktop ); ?> mb-4 <?php echo esc_attr( implode( ' ', $filters )); ?>">
 				<div class="ufg-thumbnail-border">
 					<?php if ( $ufg_lightbox ) { ?>
@@ -61,7 +59,6 @@ function ufg_gallery( $ufg_gallery_id, $ufg_gallery ) {
 			<?php
 		}
 		?>
-		
 		<script>
 		jQuery('button.ufg-level-one-button').fadeOut(); //hide all level 1 buttons
 		

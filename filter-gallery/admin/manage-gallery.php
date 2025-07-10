@@ -9,42 +9,40 @@ wp_enqueue_style( 'wp-color-picker' );
 wp_enqueue_script('wp-color-picker');
 
 //CSS
-wp_enqueue_style( 'ufg-admin-style-css', plugins_url( 'assets/style.css', __FILE__ ));
-wp_enqueue_style( 'ufg-bootstrap-admin-css', plugins_url( 'assets/bootstrap-4.6.0/css/bootstrap-admin.css', __FILE__ ));
-wp_enqueue_style( 'ufg-fontawesome-css', plugins_url( 'assets/fontawesome-free-5.3.1-web/css/all.css', __FILE__ ));
-wp_enqueue_style( 'ufg-bootstrap-iconpicker-css', plugins_url( 'assets/drag-drop-menu/bootstrap-iconpicker/css/bootstrap-iconpicker.css', __FILE__ ));
-wp_enqueue_style( 'ufg-bootstrap-multiselect-css', plugins_url( 'assets/css/bootstrap-multiselect.css', __FILE__ ));
+wp_enqueue_style( 'ufg-admin-style-css', plugins_url( 'assets/style.css', __FILE__ ), array(), '1.0', 'all');
+wp_enqueue_style( 'ufg-bootstrap-admin-css', plugins_url( 'assets/bootstrap-4.6.0/css/bootstrap-admin.css', __FILE__ ), array(), '4.0.6', 'all');
+wp_enqueue_style( 'ufg-fontawesome-css', plugins_url( 'assets/fontawesome-free-5.3.1-web/css/all.css', __FILE__ ), array(), '5.3.1', 'all');
+wp_enqueue_style( 'ufg-bootstrap-iconpicker-css', plugins_url( 'assets/drag-drop-menu/bootstrap-iconpicker/css/bootstrap-iconpicker.css', __FILE__ ), array(), '1.10.0', 'all');
+wp_enqueue_style( 'ufg-bootstrap-multiselect-css', plugins_url( 'assets/css/bootstrap-multiselect.css', __FILE__ ), array(), '1.10.0', 'all');
 
 //JS
 wp_enqueue_script( 'ufg-popper-js', plugins_url( 'assets/js/popper.js', __FILE__ ), array('jquery'), '2.5.3', true );
 wp_enqueue_script( 'ufg-bootstrap-js', plugins_url( 'assets/bootstrap-4.6.0/js/bootstrap.js', __FILE__ ), array('jquery'), '4.6.0', true );
 wp_enqueue_script( 'ufg-bootstrap-bundle-js', plugins_url( 'assets/bootstrap-4.6.0/js/bootstrap.bundle.js', __FILE__ ), array('jquery'), '4.6.0', true );
-wp_enqueue_script( 'ufg-jquery-menu-editor-js', plugins_url( 'assets/drag-drop-menu/jquery-menu-editor.js', __FILE__ ), array('jquery'), '1.0.0' );
-wp_enqueue_script( 'ufg-iconset-fontawesome-js', plugins_url( 'assets/drag-drop-menu/bootstrap-iconpicker/js/iconset/fontawesome5-3-1.js', __FILE__ ), array('jquery'), '5.3.1' );
-wp_enqueue_script( 'ufg-bootstrap-iconpicker-js', plugins_url( 'assets/drag-drop-menu/bootstrap-iconpicker/js/bootstrap-iconpicker.min.js', __FILE__ ), array('jquery'), '1.10.0' );
-wp_enqueue_script( 'ufg-uploader-js', plugins_url( 'assets/js/ufg-uploader.js', __FILE__ ), array('jquery'), '1.0.0' );
+wp_enqueue_script( 'ufg-jquery-menu-editor-js', plugins_url( 'assets/drag-drop-menu/jquery-menu-editor.js', __FILE__ ), array('jquery'), '1.0.0', true );
+wp_enqueue_script( 'ufg-iconset-fontawesome-js', plugins_url( 'assets/drag-drop-menu/bootstrap-iconpicker/js/iconset/fontawesome5-3-1.js', __FILE__ ), array('jquery'), '5.3.1', true );
+wp_enqueue_script( 'ufg-bootstrap-iconpicker-js', plugins_url( 'assets/drag-drop-menu/bootstrap-iconpicker/js/bootstrap-iconpicker.min.js', __FILE__ ), array('jquery'), '1.10.0', true );
+wp_enqueue_script( 'ufg-uploader-js', plugins_url( 'assets/js/ufg-uploader.js', __FILE__ ), array('jquery'), '1.0.0', true );
 // reference: https://www.jqueryscript.net/form/advanced-multiselect-easy.html
 
 // reference: progress bar - https://www.codeply.com/go/bp/106527
-wp_enqueue_script( 'ufg-bootstrap-multiselect-js', plugins_url( 'assets/js/bootstrap-multiselect.min.js', __FILE__ ), array('jquery'), '' );
+wp_enqueue_script( 'ufg-bootstrap-multiselect-js', plugins_url( 'assets/js/bootstrap-multiselect.min.js', __FILE__ ), array('jquery'), '1.0', 'all' );
 
 //get / create next gallery id
-if(isset($_GET['id'])){
-	if ( current_user_can( 'manage_options' ) ) {
-		if ( isset( $_GET['ufg-nonce'] ) && wp_verify_nonce( $_GET['ufg-nonce'], 'edit-gallery' ) ) {
-			$ufg_gallery_id = sanitize_text_field($_GET['id']);
-			$ufg_filters = get_option("ufg_filters_".$ufg_gallery_id);
-			$ufg_gallery = get_option("ufg_gallery_".$ufg_gallery_id);
-			$ufg_settings = get_option("ufg_settings_".$ufg_gallery_id);
-			$ufg_details = get_option("ufg_details_".$ufg_gallery_id);
-		} else {
-			die;
-		}
+if (isset($_GET['id'])) {
+	if (isset($_GET['ufg-nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['ufg-nonce'])), 'edit-gallery')) {
+		$ufg_gallery_id = sanitize_text_field(wp_unslash($_GET['id']));
+		$ufg_filters = get_option("ufg_filters_" . $ufg_gallery_id);
+		$ufg_gallery = get_option("ufg_gallery_" . $ufg_gallery_id);
+		$ufg_settings = get_option("ufg_settings_" . $ufg_gallery_id);
+		$ufg_details = get_option("ufg_details_" . $ufg_gallery_id);
+	} else {
+		die;
 	}
 } else {
-	$ufg_gallery_id = ufg_get_next_id();
-	$ufg_filters = array();
-	$ufg_gallery = array();
+    $ufg_gallery_id = ufg_get_next_id();
+    $ufg_filters = array();
+    $ufg_gallery = array();
 }
 ?>
 <div class="container-fluid py-2">
@@ -111,7 +109,6 @@ if(isset($_GET['id'])){
 			</div>
 		</div>
 		<div class="col-md-12">
-			
 			<div class="py-3 ufg-steps">
 				<div id="ufg-filter-save-process" class="spinner-grow m-3 text-dark d-none" role="status">
 					<span class="visually-hidden"></span>
@@ -125,7 +122,6 @@ if(isset($_GET['id'])){
 			</div>
 		</div>
 	</div>
-
 
 	<!--gallery steps two-->
 	<div class="row ufg-step-2 py-3 d-none">
@@ -148,6 +144,7 @@ if(isset($_GET['id'])){
 				<p><img src="<?php echo esc_url(plugins_url( 'assets/img/upload-image.png', __FILE__ )); ?>"></p>
 				<h2 class="text-white"><?php esc_html_e( 'Upload Images', 'filter-gallery' ); ?></h2>
 			</button>
+			<input type="hidden" id="ufg_li_generate_nonce" name="ufg_li_generate_nonce" value="<?php echo esc_attr( wp_create_nonce( 'ufg-li-generate' ) ); ?>">
 		</div>
 		
 		<!-- step navigation start-->
@@ -493,7 +490,6 @@ if(isset($_GET['id'])){
 			<h2><?php esc_html_e( 'Gallery Shortcode', 'filter-gallery' ); ?></h2>
 			<hr />
 		</div>
-		
 		<div class="col-md-6 py-3">
 			<div class="form-group">
 				<input type="text" class="form-control w-25" name="ufg-shortcode" id="ufg-shortcode" value="[ufg id=<?php echo esc_attr($ufg_gallery_id); ?>]">
@@ -503,7 +499,6 @@ if(isset($_GET['id'])){
 				<button class="btn btn-sm btn-success d-none ufg-copied ml-2"><?php esc_html_e('Shortcode Copied', 'filter-gallery'); ?></button>
 			</div>
 		</div>
-		
 		<div class="py-3 ufg-steps">
 			<button type="button" id="step-3-btn-back" class="btn btn-primary">
 				<h2 class="text-white"><i class="far fa-arrow-alt-circle-left"></i> <?php esc_html_e( 'Settings', 'filter-gallery' ); ?></h2>
@@ -513,7 +508,6 @@ if(isset($_GET['id'])){
 	<!--gallery steps four end-->
 	
 </div>
-
 <style>
 	#ufg-gallery { }
 	#ufg-gallery li { float: left; cursor: move; width: 100%;}
@@ -598,13 +592,10 @@ jQuery(document).ready(function () {
 	var editor = new MenuEditor('UFG_FilterEditor', {listOptions: sortableListOptions, iconPicker: iconPickerOptions});
 	editor.setForm(jQuery('#frmEdit'));
 	editor.setUpdateButton(jQuery('#btnUpdate'));
-	/* jQuery('#btnReload').on('click', function () {
-		editor.setData(arrayjson);
-	}); */
 	
 	//load saved filters
-	//console.log(<?php echo json_encode($ufg_filters); ?>);
-	var filtersarrayjson = <?php echo json_encode($ufg_filters); ?>;
+	//console.log(<?php echo wp_json_encode($ufg_filters); ?>);
+	var filtersarrayjson = <?php echo wp_json_encode($ufg_filters); ?>;
 	editor.setData(filtersarrayjson);
 
 	jQuery("#btnUpdate").click(function(){
@@ -620,9 +611,6 @@ jQuery(document).ready(function () {
 	});
 	// add / update / delete filters end
 
-	/** PAGE ELEMENTS **/
-	//jQuery('[data-toggle="tooltip"]').tooltip();
-	
 	// go back to step-1
 	jQuery('#step-1-btn-back').click(function(){
 		jQuery( ".ufg-step-2" ).addClass( "d-none" );
@@ -728,17 +716,12 @@ jQuery(document).ready(function () {
 				'image_filters': image_filters,
 			}, 
 			success: function (result) {
-				//alert(result);
 				if(ufg_event_value == "save-gallery") {
-					// hide loading start
 					jQuery(function() {
-						// it will wait for 5 sec. and then will fire
-						// $("#successMessage").hide() function
 						setTimeout(function() {
 							// hide processing icon and show button
 							jQuery('button#ufg-save-gallery, button#step-1-btn-back, button#step-3-btn').removeClass('d-none');
 							jQuery('div#ufg-gallery-save-process').addClass('d-none');
-							
 						}, 1500);
 					});
 					// hide loading end
@@ -750,7 +733,6 @@ jQuery(document).ready(function () {
 				//alert("error");
 			}
 		});
-		
 	});
 	
 	// back to step-2
