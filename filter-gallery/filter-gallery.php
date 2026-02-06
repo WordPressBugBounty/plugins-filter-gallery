@@ -4,12 +4,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Plugin Name:       Filter Gallery
+ * Plugin Name:       Responsive Filterable Gallery
  * Plugin URI:        https://wpfrank.com/
- * Description:       Create portfolio gallery on website with responsive layout and fiters
- * Version:           0.2.2
+ * Description:       Build a responsive filter gallery for your portfolio. Organize images with tags in a stunning grid or masonry layout easily
+ * Version:           0.2.3
  * Requires at least: 4.0
- * Requires PHP:      4.0
+ * Requires PHP:      5.0
  * Author:            farazfrank
  * Author URI:        https://profiles.wordpress.org/farazfrank/
  * License:           GPL v2 or later
@@ -106,6 +106,7 @@ function ufg_get_next_id(){
 	global $wpdb;
 	$ufg_gallery_key = "ufg_gallery_";
 	// reference : https://wordpress.stackexchange.com/questions/8825/how-do-you-properly-prepare-a-like-sql-statement
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Query for unique ID generation cannot be cached
 	$ufg_gallery_count_res = $wpdb->get_row(
 		$wpdb->prepare("SELECT option_name FROM `$wpdb->options` WHERE `option_name` LIKE %s ORDER BY option_id DESC LIMIT 1", '%'.$ufg_gallery_key.'%'), ARRAY_N
 	);
@@ -271,19 +272,23 @@ function ufg_save_gallery_callback(){
 			
 			// Parse and sanitize POST data
 			if (isset($_POST['image_id'])) {
-				parse_str(urldecode_deep($_POST['image_id']), $ufg_image_id);
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized via map_deep after parse_str
+				parse_str(urldecode_deep(wp_unslash($_POST['image_id'])), $ufg_image_id);
 				$ufg_image_id = map_deep($ufg_image_id, 'sanitize_text_field');
 			}
 			if (isset($_POST['image_title'])) {
-				parse_str(urldecode_deep($_POST['image_title']), $ufg_image_title);
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized via map_deep after parse_str
+				parse_str(urldecode_deep(wp_unslash($_POST['image_title'])), $ufg_image_title);
 				$ufg_image_title = map_deep($ufg_image_title, 'sanitize_text_field');
 			}
 			if (isset($_POST['image_alt'])) {
-				parse_str(urldecode_deep($_POST['image_alt']), $ufg_image_alt);
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized via map_deep after parse_str
+				parse_str(urldecode_deep(wp_unslash($_POST['image_alt'])), $ufg_image_alt);
 				$ufg_image_alt = map_deep($ufg_image_alt, 'sanitize_text_field');
 			}
 			if (isset($_POST['image_filters'])) {
-				parse_str(urldecode_deep($_POST['image_filters']), $ufg_image_filters);
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized via map_deep after parse_str
+				parse_str(urldecode_deep(wp_unslash($_POST['image_filters'])), $ufg_image_filters);
 				$ufg_image_filters = map_deep($ufg_image_filters, 'sanitize_text_field');
 			}
 			

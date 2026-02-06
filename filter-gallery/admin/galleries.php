@@ -11,10 +11,19 @@ wp_enqueue_style( 'fontawesome-css', plugins_url( 'assets/fontawesome-free-5.3.1
 global $wpdb;
 $ufg_options_table_name = "{$wpdb->prefix}options";
 $ufg_gallery_key        = 'ufg_filters_';
-// reference : https://wordpress.stackexchange.com/questions/8825/how-do-you-properly-prepare-a-like-sql-statement
-$ufg_all_galleries = $wpdb->get_results(
-	$wpdb->prepare( "SELECT option_name FROM `$wpdb->options` WHERE `option_name` LIKE %s ORDER BY option_id ASC", '%' . $ufg_gallery_key . '%' )
-);
+
+// Try to get cached results first
+$ufg_cache_key = 'ufg_all_galleries_list';
+$ufg_all_galleries = wp_cache_get( $ufg_cache_key, 'filter-gallery' );
+
+if ( false === $ufg_all_galleries ) {
+	// reference : https://wordpress.stackexchange.com/questions/8825/how-do-you-properly-prepare-a-like-sql-statement
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom options query with caching implemented
+	$ufg_all_galleries = $wpdb->get_results(
+		$wpdb->prepare( "SELECT option_name FROM `$wpdb->options` WHERE `option_name` LIKE %s ORDER BY option_id ASC", '%' . $ufg_gallery_key . '%' )
+	);
+	wp_cache_set( $ufg_cache_key, $ufg_all_galleries, 'filter-gallery', HOUR_IN_SECONDS );
+}
 
 // get current plugin version
 $ufg_current_version = get_option( 'ufg_current_version' );
