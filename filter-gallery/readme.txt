@@ -2,10 +2,10 @@
 Contributors: awordpresslife, razipathhan, hanif0991, muhammadshahid, fkfaisalkhan007, sharikkhan007, zishlife, FARAZFRANK
 Donate link: https://wpfrank.com/
 Tags: responsive, filter gallery, portfolio, image gallery, masonry
-Requires at least: 4.0
-Tested up to: 6.9
-Stable tag: 0.2.3
-Requires PHP: 5.0
+Requires at least: 6.0
+Tested up to: 7.0.2
+Stable tag: 1.1.2
+Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,7 +13,7 @@ Build a responsive filter gallery for your portfolio. Organize images with filte
 
 == Description ==
 
-The **Responsive Filter Gallery** plugin makes it simple to create beautiful, organized image displays on your WordPress site. Whether you need a professional portfolio showcase, a product catalog, or a creative photography album, this tool lets you sort content dynamically without page reloads.
+The **Filter Gallery** plugin makes it simple to create beautiful, organized image displays on your WordPress site. Whether you need a professional portfolio showcase, a product catalog, or a creative photography album, this tool lets you sort content dynamically without page reloads.
 
 **Check Free Version Demo:** [Filter Gallery](https://wpfrank.com/demo/filter-gallery-free-wordpress-pluign/)
 **Check Pro Version Demo:** [Filter Gallery Pro](https://wpfrank.com/demo/filter-gallery-pro/)
@@ -28,25 +28,29 @@ We designed this plugin to be intuitive and lightweight. You can upload images, 
 
 = Key Features =
 
-*   **Responsive Design:** Automatically adapts to any screen size.
-*   **Filterable Categories:** meaningful tags to organize your projects or products.
-*   **Bootstrap Integrated:** Built on the solid foundation of Bootstrap for reliability.
-*   **Easy Management:** Simple drag-and-drop interface for ordering images.
-*   **Unlimited Galleries:** Create as many distinctive galleries as you need.
-*   **Lightbox Support:** Includes a built-in lightbox for viewing full-size images.
-*   **Shortcode System:** precise placement of galleries anywhere on your site.
+*   **Unlimited Galleries & Shortcodes:** Create as many galleries as needed, using `[filter-gallery]` or `[ufg]` shortcodes.
+*   **Responsive Columns & Masonry Layouts:** Adapts grid and display columns automatically to device viewports with Masonry support.
+*   **Easy Drag-and-Drop Management:** Simple interface for ordering images (ID and manual sorting).
+*   **Standard Lightbox Overlay:** Includes a built-in lightbox with title overlays.
+*   **Category Filtering & Controls:** Set default loaded category, configure "All" button visibility, customize label, or assign custom icons.
+*   **Media Styling & Customizer:** Adjust grid padding, border spacing, customize image titles and descriptions (with length limits) inside settings.
+*   **Speed Optimized:** No frontend bloat, enqueued scripts without Bootstrap or FontAwesome.
+*   **Import/Export Dashboard:** Migrate gallery layout configurations to other setups effortlessly.
 
 = Pro Version Features =
 
 Unlock the full potential of your portfolios with the Pro Version:
 
-*   **Unlimited Filters:** Create deep folder structures with parent and child filters.
-*   **Advanced Layouts:** Choose from Masonry, multi-column (2, 3, 4), and more.
-*   **Custom Styling:** Full control over colors for buttons, titles, and active states.
-*   **SEO Optimization:** Add "Alt" text to images for better search engine visibility.
-*   **External Linking:** Link gallery images to custom URLs.
-*   **Hover Effects:** Choose from multiple distinct hover animations.
-*   **Premium Support:** Get priority assistance for any questions.
+*   **Deep Hierarchical Nested Filters:** Create multi-level filter nesting categories (up to 5 levels).
+*   **Custom Redirect Links:** Link gallery images directly to external or internal URLs with "Read More" button customizer.
+*   **Searchable Icons Picker:** Assign FontAwesome icons easily to filter tags using a searchable selection picker.
+*   **Dynamic AJAX Loading:** Speed up large portfolios with AJAX Asynchronous Pagination, AJAX Load More, and CSS preloaders.
+*   **Advanced Columns & Layouts:** Fully customize grid columns (1 to 6) and enable Justified Grid layout options.
+*   **Category Styling & Colors:** Dedicated level-by-level color pickers for category text, background, hovers, and active states.
+*   **Advanced Image Sorting:** Sort images by Random shuffle, Title, ID, or manual drag-and-drop.
+*   **Customizable Lightbox:** Show full media descriptions and slide index numbering in the modal.
+*   **15+ Hover Animations:** Select from a premium list of hover transitions and zoom overlays.
+*   **Premium Utility Tools:** Duplicate filters, bulk delete media, and priority customer support desk assistance.
 
 == Installation ==
 
@@ -92,6 +96,33 @@ You can visit our website at [wpfrank.com](https://wpfrank.com/) to purchase the
 
 == Changelog ==
 
+= 1.1.2 =
+* Implemented automatic data migration and settings normalization for legacy v0.2.3 galleries.
+* Added responsive, large tab navigation controls and shortcode copy badge scaling.
+* Resolved tab buttons and main header layout container overlapping on mobile screens by implementing a custom sticky floating-pill design.
+* Prevented layout cuts on mobile screen widths (< 640px) by hiding tab navigation text and separators.
+* Improved filters manager layout on mobile screens by allowing horizontal scrolling and wrapping.
+* Optimized the "Confirm & Deploy Changes" save button to fit as a sleek single-line pill on mobile.
+* Solved jQuery selector crash on frontend digit-starting DOM IDs and added defensive array checks.
+* Fixed output escaping for UFG_VERSION, admin_url(), $indent, $prefix, and $get_count_html for security compliance.
+* Added input sanitization for $_POST['ufg_gallery_id'] on direct assignment.
+* Resolved various PHPCS and security guidelines warnings across all files.
+
+= 1.1.1 =
+* Restricted column layout selections to standard limits in Free version.
+* Limited sorting options to ID-based ascending/descending and None/Manual.
+* Fixed React rendering crash in the admin panel.
+
+= 1.1.0 =
+* Replaced legacy PHP admin templates with a modern React-based interface.
+* Removed bundled third-party libraries (Bootstrap, Font Awesome) for 2026 guideline compliance.
+* Implemented non-destructive data migration system for backward compatibility.
+* Improved security with better sanitization and nonce verification.
+* Updated minimum requirements to WordPress 6.0 and PHP 7.4.
+
+= 1.0.0 =
+* Initial alignment with modern architecture patterns.
+
 = 0.2.3 =
 * Fixed Requires PHP header mismatch between readme and plugin file
 * Added proper input sanitization for POST data
@@ -125,5 +156,5 @@ You can visit our website at [wpfrank.com](https://wpfrank.com/) to purchase the
 
 == Upgrade Notice ==
 
-= 0.2.3 =
-* Fixed Requires PHP header mismatch between readme and plugin file
+= 1.0.0 =
+* This major update modernizes the admin interface and improves security. Your existing gallery data is preserved.

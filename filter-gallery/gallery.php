@@ -1,223 +1,243 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; /* Exit if accessed directly */
-}
+if (!defined('ABSPATH'))
+	exit; // Exit if accessed directly
 
-/* this file print gallery gallery callback */
-function ufg_gallery( $ufg_gallery_id, $ufg_gallery ) {
-	if ( is_array( $ufg_gallery ) && $gallery_image_count = count( $ufg_gallery ) ) {
+// this file print gallery - gallery callback
+if (!function_exists('ufg_gallery')) {
+	function ufg_gallery($ufg_gallery_id, $ufg_gallery, $ufg_images_per_page, $atts = array())
+	{
+			if (!is_array($ufg_gallery)) $ufg_gallery = array();
+			if (!isset($ufg_gallery['ufg-attachment-id']) || !is_array($ufg_gallery['ufg-attachment-id'])) $ufg_gallery['ufg-attachment-id'] = array();
+			if (!isset($ufg_gallery['ufg-title']) || !is_array($ufg_gallery['ufg-title'])) $ufg_gallery['ufg-title'] = array();
 
-		/* load settings */
-		$ufg_setting = get_option( 'ufg_settings_' . $ufg_gallery_id );
-		/* print_r($ufg_setting); */
-		include 'setting.php';
+			$load_class = '';
+			$new_array = array();
+			$new_array_final = array();
 
-		/* image sorting */
-		if ( $ufg_image_sorting == 1 ) {
-			ksort( $ufg_gallery['ufg-title'] ); /* ascending image id */
-		}
-		if ( $ufg_image_sorting == 2 ) {
-			krsort( $ufg_gallery['ufg-title'] ); /* descending image id */
-		}
+			$ufg_setting = get_option("ufg_settings_" . $ufg_gallery_id);
+			include('setting.php');
 
-		/* keys: ufg-attachment-id / ufg-title / ufg-alt / ufg-description / ufg-url / ufg-image-filters */
-		/* defaults */
-		$ufg_title = $ufg_alt = $ufg_description = $ufg_url = '';
-		foreach ( $ufg_gallery['ufg-title'] as $key => $value ) {
-			/* load values */
-			$attachment_id = $key;
-			$ufg_title     = get_the_title( $attachment_id );
-			$ufg_alt       = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
-			/* wp_get_attachment_image_src ( int $attachment_id, string|array $size = 'thumbnail', bool $icon = false ) */
-			/* thumb, thumbnail, medium, large, post-thumbnail */
-			$medium     = wp_get_attachment_image_src( $attachment_id, $ufg_thumbnail_image_size, true ); /* attachment medium URL */
-			$full       = wp_get_attachment_image_src( $attachment_id, 'full', true ); /* attachment medium URL */
-			$attachment = get_post( $attachment_id );
-
-			if ( isset( $ufg_gallery['ufg-image-filters'][ $attachment_id ] ) && count( $ufg_gallery['ufg-image-filters'][ $attachment_id ] ) ) {
-				$filters = $ufg_gallery['ufg-image-filters'][ $attachment_id ];
-			} else {
-				$filters = array();
-			}
-			?>
-			<div id="ufg-thumbnail" class="col-<?php echo esc_attr( $ufg_columns_mobile_portrait ); ?> col-sm-<?php echo esc_attr( $ufg_columns_mobile_landscape ); ?> col-md-<?php echo esc_attr( $ufg_columns_tab ); ?> col-lg-<?php echo esc_attr( $ufg_columns_desktop ); ?> mb-4 <?php echo esc_attr( implode( ' ', $filters )); ?>">
-				<div class="ufg-thumbnail-border">
-					<?php if ( $ufg_lightbox ) { ?>
-					<a href="<?php echo esc_url( $full[0] ); ?>" class="ufg-lightbox <?php echo esc_attr( implode( ' ', $filters ) ); ?>" data-title="<?php if ( $ufg_lightbox_title ) { echo esc_attr( $ufg_title ); } ?>" data-lightbox="ufg-lightbox" data-alt="<?php echo esc_attr( $ufg_alt ); ?>">
-						<img src="<?php echo esc_url( $medium[0] ); ?>" class="ufg-thumbnail-img img-fluid mx-auto d-block" alt="<?php echo esc_attr( $ufg_alt ); ?>">
-					</a>
-					<?php } else { ?>
-						<img src="<?php echo esc_url( $medium[0] ); ?>" class="ufg-thumbnail-img img-fluid mx-auto d-block" alt="<?php echo esc_attr( $ufg_alt ); ?>">
-					<?php } ?>
-					<div class="ufg-image-content">
-						<?php if ( $ufg_image_title ) { ?>
-						<p class="ufg-image-title pr-2 pl-2"><?php echo esc_html( $ufg_title ); ?></p>
-						<?php } ?>
-					</div>
-				</div>
-			</div>
-			<?php
-		}
-		?>
-		<script>
-		jQuery('button.ufg-level-one-button').fadeOut(); //hide all level 1 buttons
-		
-		function filter(id, value) {
-			//console.log(id); */
-			//console.log(value); */
-			var ufg_btn_text = "";
-			var ufg_btn_text2 = "";
-			var ufg_current_clicked_filter_id = "";
-			var ufg_current_clicked_filter_level = "";
-			var ufg_last_clicked_filter_id = "";
-			var ufg_last_clicked_filter_level = "";
-			var ufg_last_clicked_filter_parent_id = "";
-			
-			ufg_current_clicked_filter_id = jQuery("#ufg_current_clicked_filter_id").val(); /* get last clicked filter id */
-			ufg_current_clicked_filter_level = jQuery("#ufg_current_clicked_filter_level").val(); /* set current clicked filter level*/
-			ufg_last_clicked_filter_id = jQuery("#ufg_last_clicked_filter_id").val(); /* get last clicked filter id*/
-			ufg_last_clicked_filter_level = jQuery("#ufg_last_clicked_filter_level").val(); /* get last clicked filter level*/
-			
-			ufg_current_clicked_parent_filter_id = jQuery("#ufg_current_clicked_parent_filter_id").val(); /* get current clicked parent filter id*/
-			ufg_last_clicked_filter_parent_id = jQuery("#ufg_last_clicked_filter_parent_id").val(); /* get last clicked parent filter id*/
-			
-			/* set current - initials case */
-			if(ufg_current_clicked_filter_id == "") {
-				//get current clicked filter level */
-				//console.log(id.match("1evel1")); */
-				if(id.match("1evel1")){ ufg_current_clicked_filter_level = "1evel1"; }
-				//console.log(ufg_current_clicked_filter_level); */
-				if(id.match("level2")){ ufg_current_clicked_filter_level = "level2"; }
-				//console.log(ufg_current_clicked_filter_level); */
-				if(id.match("level3")){ ufg_current_clicked_filter_level = "level3"; }
-				//console.log(ufg_current_clicked_filter_level); */
-				
-				/* set filter id and get */
-				jQuery("#ufg_current_clicked_filter_id").val(id);
-				jQuery("#ufg_current_clicked_filter_level").val(ufg_current_clicked_filter_level);
-				
-				jQuery("#ufg_last_clicked_filter_id").val(id);
-				jQuery("#ufg_last_clicked_filter_level").val(ufg_current_clicked_filter_level);
-				
-				console.log(ufg_last_clicked_filter_parent_id);
-				if(ufg_current_clicked_filter_level == "1evel1") {
-					jQuery("#ufg_last_clicked_filter_parent_id").val(id);
+			echo "<div id='ufg-gallery-" . esc_attr($ufg_gallery_id) . "' class='ufg-gallery'>";
+			echo "<div class='ufg-grid-sizer'></div>";
+			$j = 0;
+			$new_array = array();
+			$new_array_final = array();
+			if (is_array($ufg_gallery) && array_key_exists('ufg-image-filters', $ufg_gallery)) {
+				foreach ($ufg_gallery['ufg-image-filters'] as $key => $array) {
+					if (is_array($array)) {
+						foreach ($array as $key2 => $val) {
+							if (strpos($val, ',') !== false) {
+								$parts = explode(',', $val);
+								foreach ($parts as $p) {
+									$p = trim($p);
+									if (!empty($p)) {
+										$new_array[$p][$j] = $key;
+									}
+								}
+							} else {
+								//array_push($new_array[], $val);
+								$new_array[$val][$j] = $key;
+							}
+						}
+					}
+					$j++;
 				}
-				
-				/* set current last clicked parent filter id */
-				jQuery("#ufg_current_clicked_parent_filter_id").val(id);
-				jQuery("#ufg_last_clicked_filter_parent_id").val(id);
-				
-			} else {
-				
-				/* transfer current filter to last filter (transfer before getting filter level) */
-				jQuery("#ufg_last_clicked_filter_id").val(ufg_current_clicked_filter_id);
-				jQuery("#ufg_last_clicked_filter_level").val(ufg_current_clicked_filter_level);
-				
-				//get current clicked filter level */
-				//console.log(id.match("1evel1")); */
-				if(id.match("1evel1")){ ufg_current_clicked_filter_level = "1evel1"; }
-				//console.log(ufg_current_clicked_filter_level); */
-				if(id.match("level2")){ ufg_current_clicked_filter_level = "level2"; }
-				//console.log(ufg_current_clicked_filter_level); */
-				if(id.match("level3")){ ufg_current_clicked_filter_level = "level3"; }
-				//console.log(ufg_current_clicked_filter_level); */
-				
-				/* set current filters */
-				jQuery("#ufg_current_clicked_filter_id").val(id);
-				jQuery("#ufg_current_clicked_filter_level").val(ufg_current_clicked_filter_level);
-				
-				ufg_last_clicked_filter_id = jQuery("#ufg_last_clicked_filter_id").val(); /* get last clicked filter id */
-				ufg_last_clicked_filter_level = jQuery("#ufg_last_clicked_filter_level").val(); /* get last clicked filter level */
-				
-				/* remove check icon on last clicked filter - if same level2 filter button clicked */
-				if(ufg_current_clicked_filter_level == "level2" && ufg_last_clicked_filter_level == "level2"){
-					/* remove check icon from last clicked filter button */
-					ufg_btn_text = jQuery("#" + ufg_last_clicked_filter_id).html(); /* get html value */
-					//console.log(ufg_btn_text);
-					ufg_btn_text = ufg_btn_text.replace(' <i class="fas fa-check"></i>', ''); /* remove icon */
-					//console.log(ufg_btn_text);
-					jQuery("#" + ufg_last_clicked_filter_id).html(ufg_btn_text); /* set remove icon */
+				foreach ($new_array as $new_key => $new_val) {
+					$new_re_in = array_values($new_val);
+					$new_array_final[$new_key] = $new_re_in;
 				}
+				$filter_image = $new_array_final;
 				
-				/* when transferring filter from level2 to level1 */
-				if(ufg_current_clicked_filter_level === "1evel1") {
-					/* transfer last clicked parent filter id to current  */
-					jQuery("#ufg_current_clicked_parent_filter_id").val(id);
-					jQuery("#ufg_last_clicked_parent_filter_id").val(ufg_current_clicked_parent_filter_id);
-					
-					/* remove check icon from last clicked filter button */
-					ufg_btn_text = jQuery("#" + ufg_current_clicked_parent_filter_id).html(); /* get html value */
-					//console.log(ufg_btn_text);
-					ufg_btn_text = ufg_btn_text.replace(' <i class="fas fa-check"></i>', ''); /* remove icon */
-					//console.log(ufg_btn_text);
-					jQuery("#" + ufg_current_clicked_parent_filter_id).html(ufg_btn_text); /* set remove icon */
-					
-					/* remove check icon from last clicked first filter button */
-					ufg_btn_text = jQuery("#" + ufg_last_clicked_filter_id).html(); /* get html value */
-					//console.log(ufg_btn_text);
-					ufg_btn_text = ufg_btn_text.replace(' <i class="fas fa-check"></i>', ''); /* remove icon */
-					//console.log(ufg_btn_text);
-					jQuery("#" + ufg_last_clicked_filter_id).html(ufg_btn_text); /* set remove icon */
+				if (!function_exists('ufg_expand_filter_images_hierarchy')) {
+					function ufg_expand_filter_images_hierarchy($filters, &$filter_images) {
+						$all_images = array();
+						if (is_array($filters)) {
+							foreach ($filters as $f) {
+								if (!isset($f->filterkey)) continue;
+								$key = str_replace(" ", "-", strtolower(trim($f->filterkey)));
+								
+								$my_images = isset($filter_images[$key]) ? $filter_images[$key] : array();
+								
+								if (isset($f->children) && is_array($f->children)) {
+									ufg_expand_filter_images_hierarchy($f->children, $filter_images);
+								}
+								
+								$my_images = array_values(array_unique($my_images));
+								if (!empty($my_images)) {
+									$filter_images[$key] = $my_images;
+								}
+								$all_images = array_merge($all_images, $my_images);
+							}
+						}
+						return array_unique($all_images);
+					}
+				}
+				if (!isset($ufg_filters) || empty($ufg_filters)) {
+					$ufg_filters = get_option("ufg_filters_" . $ufg_gallery_id);
+				}
+				if (!empty($ufg_filters)) {
+					if (function_exists('ufg_normalize_filters_recursive')) {
+						ufg_normalize_filters_recursive($ufg_filters);
+					}
+					ufg_expand_filter_images_hierarchy($ufg_filters, $filter_image);
 				}
 			}
-			
-			/* add check icon on current clicked filter */
-			ufg_btn_text = jQuery("#" + id).html(); /* get html value */
-			//console.log(ufg_btn_text);
-			jQuery("#" + id).html(ufg_btn_text + ' <i class="fas fa-check"></i>');
-			
-			/* hide all level 2 button */
-			if(ufg_current_clicked_filter_level != "level2"){ /* display only level on filter accordingly parent filters clicked */
-				jQuery('button.ufg-level-one-button').fadeOut(); //hide all level 1 buttons */
-			}
-			
-			//filtering */
-			if(value == "all") {
-				/* show all filters */
-				jQuery('button.ufg-parent-filters ').fadeIn( "slow" ); //display all filters */
-				
-				/* show all images */
-				jQuery('div#ufg-thumbnail').fadeIn( "slow" ); //display all images */
-				
-				/* lightbox - remove data attribute and dynamic add lightbox data-lightbox to anchor tag */
-				<?php if ( $ufg_lightbox ) { ?>
-				jQuery('.ufg-lightbox').removeData();
-				jQuery('.ufg-lightbox').attr('data-lightbox', 'ufg-lightbox'); /* add data-lightbox for all images cycle in lightbox */
-				<?php } ?>
-			} else {
-				/* remove data-lightbox attribute from all ufg-thumbnail */
-				<?php if ( $ufg_lightbox ) { ?>
-				jQuery('a.ufg-lightbox').removeAttr('data-lightbox');
-				<?php } ?>
-				
-				/* show hide images */
-				jQuery('div#ufg-thumbnail').fadeOut( "slow" ); //hide all visible images */
-				jQuery('div.' + value).fadeIn( "slow" ); //display only clicked images //and filters button */
-				jQuery('button.' + value).fadeIn( "slow" ); //display only clicked filters button and images */
-				
-				/* dynamically add lightbox data-filter classes accordingly parent and sub filter clicked */
-				<?php if ( $ufg_lightbox ) { ?>
-				var lighbox_class_name = "ufg-lightbox-" + value;
-				jQuery('.' + value ).attr('data-lightbox', lighbox_class_name); /* add data filter for parent filters */
-				<?php } ?>
-			}
-		}
 
-		<?php if ( $ufg_lightbox ) { ?>
-		jQuery(document).ready(function(){
-			lightbox.option({
-				'fadeDuration' : 600,
-				'fitImagesInViewport' : true,
-				'imageFadeDuration' : 600,
-				'positionFromTop' : 50,
-				'resizeDuration' : 700,
-				'wrapAround': true,
-			});
-		});
-		<?php } ?>
-		</script>
-		<?php
+			//image sorting
+			if (is_array($ufg_gallery) && array_key_exists('ufg-title', $ufg_gallery)) {
+				if ($ufg_image_sorting == 1)
+					ksort($ufg_gallery['ufg-title']); //ascending image id
+				if ($ufg_image_sorting == 2)
+					krsort($ufg_gallery['ufg-title']); //descending image id
+			}
+
+			$ufg_total_images = is_array($ufg_gallery['ufg-attachment-id']) ? count($ufg_gallery['ufg-attachment-id']) : 0;
+
+			// load more array
+			$load_id_array = array();
+			if ($ufg_image_sorting == 5) { //if sorting is OFF
+				if (is_array($ufg_gallery['ufg-attachment-id'])) {
+					foreach ($ufg_gallery['ufg-attachment-id'] as $value) {
+						$load_id_array[] = $value;
+					}
+				}
+			} else { //if sorting is ON
+				if (is_array($ufg_gallery['ufg-title'])) {
+					foreach ($ufg_gallery['ufg-title'] as $key => $value) {
+						$load_id_array[] = $key;
+					}
+				}
+			}
+
+			//echo $ufg_total_images;
+
+			//keys: ufg-attachment-id / ufg-title / ufg-alt / ufg-description / ufg-url / ufg-image-filters
+			//defaults
+			$ufg_title = $ufg_alt = $ufg_description = $ufg_url = "";
+
+			// Load more var
+			$load_more = 'off';
+			$count = 0;
+			$no = 1;
+			//******************** Load Image With Limit [Shortcode] *******************//
+			if ($load_more != 'on') {
+
+				if ($ufg_image_sorting == 5) { //if sorting is OFF
+					$reversed_attachment_ids = is_array($ufg_gallery['ufg-attachment-id']) ? $ufg_gallery['ufg-attachment-id'] : array();
+					//$reversed_attachment_ids = array_reverse($ufg_gallery['ufg-attachment-id'], true);
+					foreach ($reversed_attachment_ids as $value) {
+						$attachment_id = $value;
+						// Load Gallery Content
+						include('gallery-content.php');
+					}
+				} else { //if sorting is ON
+					$reversed_attachment_ids = is_array($ufg_gallery['ufg-title']) ? $ufg_gallery['ufg-title'] : array();
+					foreach ($reversed_attachment_ids as $key => $value) {
+						$attachment_id = $key;
+						// Load Gallery Content
+						include('gallery-content.php');
+					}
+				}
+			}
+
+
+			//******************** Load More Is ON *******************//
+			if ($load_more == 'on') {
+				// run loop according to remaining images
+				//$load_limit = 5;
+				$load_limit_int = (int) $load_limit;
+				if ($load_limit_int <= 0) {
+					$load_limit_int = 4; // Fallback default if empty or 0
+				}
+
+				$remain_images = $ufg_total_images - $load_limit_int;
+				if ($remain_images < 0) {
+					$load_limit_int = $load_limit_int + $remain_images;
+				}
+
+				for ($i = 0; $i < $load_limit_int; $i++) {
+					$attachment_id = $load_id_array[$i];
+					// Load Gallery Data & Content
+					include('gallery-content.php');
+
+					$no++;
+					$count++;
+				}
+
+				if (isset($_POST['ufg_security'])) {
+					$ufg_security = sanitize_text_field(wp_unslash($_POST['ufg_security']));
+					if (wp_verify_nonce($ufg_security, 'ufg_load_more_nonce')) {
+						$ufg_limit_start = isset($_POST['ufg_limit_start']) ? intval(wp_unslash($_POST['ufg_limit_start'])) : 0;
+						$ufg_limit_end = isset($_POST['ufg_limit_end']) ? intval(wp_unslash($_POST['ufg_limit_end'])) : 0;
+						$targetFilter = isset($_POST['targetFilter']) ? sanitize_text_field(wp_unslash($_POST['targetFilter'])) : '';
+						$CalTotalLoadedItem = isset($_POST['CalTotalLoadedItem']) ? intval(wp_unslash($_POST['CalTotalLoadedItem'])) : 0;
+
+						// get already loaded images id
+						$get_all_items = isset($_POST['get_all_items']) ? sanitize_text_field(wp_unslash($_POST['get_all_items'])) : '';
+						$get_all_items_val = explode(",", $get_all_items);
+						$img_ids_diff = array_diff($load_id_array, $get_all_items_val);
+						$img_ids_diff2 = array_values($img_ids_diff);
+						$no = 0;
+
+						if ($targetFilter != '*' && isset($filter_image[$targetFilter]) && is_array($filter_image[$targetFilter])) {
+							$targetFilterD = explode(",", $targetFilter);
+							foreach ($targetFilterD as $key => $targetFilter_r) {
+								if (isset($filter_image[$targetFilter_r]) && is_array($filter_image[$targetFilter_r])) {
+									foreach ($filter_image[$targetFilter_r] as $key => $filter_image_r) {
+										$attached[] = $filter_image_r;
+									}
+								}
+							}
+							// unset already load images
+							$img_ids_diff_filter = array_diff($attached, $get_all_items_val);
+							$img_ids_diff_val = array_values($img_ids_diff_filter);
+
+							$img_ids_diff_val_count = count($img_ids_diff_val);
+						}
+
+						/* echo "<pre>";
+						print_r($ufg_limit_start);
+						echo "</pre>";
+						echo "<br>";
+						echo "<pre>";
+						print_r($ufg_limit_start);
+						echo "</pre>";
+						echo "<br>";
+						echo "<pre>";
+						print_r($ufg_limit_end);
+						echo "</pre>"; */
+
+						for ($i = $ufg_limit_start; $i < $ufg_limit_end; $i++) {
+
+							if ($targetFilter != '*') {
+								if (!isset($img_ids_diff_val[$no])) {
+									break;
+								}
+								$attachment_id = $img_ids_diff_val[$no];
+							} else {
+								if (!isset($img_ids_diff2[$no])) {
+									break;
+								}
+								$attachment_id = $img_ids_diff2[$no];
+							}
+
+							if ($load_more == 'on') {
+								$load_class = 'ufg_result';
+							} else {
+								$load_class = '';
+							}
+
+							// Load Gallery Data & Content
+							include('gallery-content.php');
+
+							$CalTotalLoadedItem++;
+							$count++;
+							$no++;
+						}
+					}
+				}
+			}
+			echo "</div>";
 	}
 }
 ?>
