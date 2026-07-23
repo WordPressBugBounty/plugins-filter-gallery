@@ -19,6 +19,7 @@ if (!function_exists('ufg_hex2rgba')) {
 }
 
 add_shortcode('ufg', 'ufg_shortcode_callback');
+add_shortcode('filter-gallery', 'ufg_shortcode_callback');
 function ufg_shortcode_callback($atts){
 	ob_start();
 	//echo "<hr>";
@@ -74,7 +75,7 @@ function ufg_shortcode_callback($atts){
 			'all_button_bg_color' => '#0A85ED',
 			'parent_button_color' => '#4F46E5',
 			'parent_button_bg_color' => '#EEF2FF',
-			'parent_button_hover_color' => '#4338CA',
+			'parent_button_hover_color' => '#000000',
 			'parent_active_button_color' => '#FFFFFF',
 			'parent_active_button_bg_color' => '#4F46E5',
 			'parent_filters_heading' => '',
@@ -129,11 +130,11 @@ function ufg_shortcode_callback($atts){
 			'load_btn_txt' => 'Load More',
 			'filter_style' => 'buttons',
 			'combine_filter_search' => '0',
-			'filter_padding' => '10px 15px',
+			'filter_padding' => '8px 16px',
 			'filter_margin' => '5px',
-			'filter_padding_type' => 'medium',
-			'filter_padding_v' => '12',
-			'filter_padding_h' => '24',
+			'filter_padding_type' => 'small',
+			'filter_padding_v' => '8',
+			'filter_padding_h' => '16',
 			'filter_margin_val' => '5',
 			'l1_button_hover_color' => '#059669',
 			'l1_active_button_color' => '#FFFFFF',
@@ -290,7 +291,7 @@ function ufg_shortcode_callback($atts){
 		wp_enqueue_style( 'ufg-frontend-css', plugins_url( '/admin/assets/css/ufg-frontend.css' , __FILE__ ), array(), UFG_VERSION );
 		wp_enqueue_style( 'ufg-lightbox-css', plugins_url( '/admin/assets/lightbox/lokesh/css/lightbox.css' , __FILE__ ), array(), '1.0' );
 		
-		wp_enqueue_style( 'ufg-fontawesome-css', plugins_url( '/admin/assets/fontawesome-free-5.3.1-web/css/all.min.css' , __FILE__ ), array(), '1.0' );
+		wp_enqueue_style( 'ufg-fontawesome-css', plugins_url( '/admin/assets/fontawesome-free-6.5.2-web/css/all.min.css' , __FILE__ ), array(), '6.5.2' );
 		wp_enqueue_script( 'ufg-custom-js', plugins_url( '/admin/assets/js/ufg-custom.js' , __FILE__ ), array( 'jquery', 'imagesloaded', 'ufg-isotope-js' ), UFG_VERSION, true );
 		wp_enqueue_script( 'ufg-lightbox-js', plugins_url( '/admin/assets/lightbox/lokesh/js/lightbox.js' , __FILE__ ), array( 'jquery' ), '1.0', true );
 		wp_add_inline_script( 'ufg-custom-js', 'const UFGJS = ' . wp_json_encode( array(

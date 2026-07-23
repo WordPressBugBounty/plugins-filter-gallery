@@ -6,8 +6,8 @@ if (!defined('ABSPATH'))
  * Plugin Name:       Filter Gallery
  * Plugin URI:        https://wpfrank.com/
  * Description:       Filter Gallery is a lightweight and powerful WordPress plugin to create beautiful filterable galleries.
- * Version:           1.1.2
- * Requires at least: 5.0
+ * Version:           1.1.3
+ * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            FARAZFRANK
  * Author URI:        https://profiles.wordpress.org/farazfrank/
@@ -18,7 +18,7 @@ if (!defined('ABSPATH'))
  */
 
 if (!defined('UFG_VERSION')) {
-	define('UFG_VERSION', '1.1.2');
+	define('UFG_VERSION', '1.1.3');
 }
 
 require_once plugin_dir_path(__FILE__) . 'includes/class-ufg-migration.php';
@@ -310,7 +310,7 @@ function ufg_enqueue_react_app()
 				'all_button_bg_color' => '#0A85ED',
 				'parent_button_color' => '#4F46E5',
 				'parent_button_bg_color' => '#EEF2FF',
-				'parent_button_hover_color' => '#4338CA',
+				'parent_button_hover_color' => '#000000',
 				'parent_active_button_color' => '#FFFFFF',
 				'parent_active_button_bg_color' => '#4F46E5',
 				'parent_filters_heading' => '',
@@ -365,11 +365,11 @@ function ufg_enqueue_react_app()
 				'load_btn_txt' => 'Load More',
 				'filter_style' => 'buttons',
 				'combine_filter_search' => '0',
-				'filter_padding' => '10px 15px',
+				'filter_padding' => '8px 16px',
 				'filter_margin' => '5px',
-				'filter_padding_type' => 'medium',
-				'filter_padding_v' => '12',
-				'filter_padding_h' => '24',
+				'filter_padding_type' => 'small',
+				'filter_padding_v' => '8',
+				'filter_padding_h' => '16',
 				'filter_margin_val' => '5',
 				'l1_button_hover_color' => '#059669',
 				'l1_active_button_color' => '#FFFFFF',
@@ -409,7 +409,7 @@ function ufg_enqueue_react_app()
 			'all_button_bg_color' => '#0A85ED',
 			'parent_button_color' => '#4F46E5',
 			'parent_button_bg_color' => '#EEF2FF',
-			'parent_button_hover_color' => '#4338CA',
+			'parent_button_hover_color' => '#000000',
 			'parent_active_button_color' => '#FFFFFF',
 			'parent_active_button_bg_color' => '#4F46E5',
 			'parent_filters_heading' => '',
@@ -464,13 +464,13 @@ function ufg_enqueue_react_app()
 			'load_btn_txt' => 'Load More',
 			'filter_style' => 'buttons',
 			'combine_filter_search' => '0',
-			'filter_padding' => '10px 15px',
+			'filter_padding' => '8px 16px',
 			'filter_margin' => '5px',
-			'filter_padding_type' => 'medium',
-			'filter_padding_v' => '12',
-			'filter_padding_h' => '24',
+			'filter_padding_type' => 'small',
+			'filter_padding_v' => '8',
+			'filter_padding_h' => '16',
 			'filter_margin_val' => '5',
-			'parent_button_hover_color' => '#4338CA',
+			'parent_button_hover_color' => '#000000',
 			'parent_active_button_color' => '#FFFFFF',
 			'parent_active_button_bg_color' => '#4F46E5',
 			'l1_button_hover_color' => '#059669',
