@@ -3,8 +3,8 @@ Contributors: awordpresslife, razipathhan, hanif0991, muhammadshahid, fkfaisalkh
 Donate link: https://wpfrank.com/
 Tags: responsive, filter gallery, portfolio, image gallery, masonry
 Requires at least: 6.0
-Tested up to: 7.0
-Stable tag: 1.1.4
+Tested up to: 7.1
+Stable tag: 1.1.5
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -92,9 +92,14 @@ You can visit our website at [wpfrank.com](https://wpfrank.com/) to purchase the
 2.  Art Gallery
 3.  Portrait Gallery
 4.  Sports Gallery Preview
-5.  How to create a filter gallery?**
+5.  How to create a filter gallery?
 
 == Changelog ==
+
+= 1.1.5 =
+* Security Fix (2026-09-14): Enforced fail-closed nonce validation and strict user capability checks (`manage_options`) across all administrative AJAX endpoints (`ufg_save_gallery`, `ufg_remove_gallery`, `ufg_gallery_filters`, `ufg_save_setting`, `ufg_clone_gallery`, `ufg_load_gallery`, and `ufg_image_id`).
+* Security Fix (2026-09-14): Restricted `ufg_save_gallery` post updates strictly to attachments (`attachment` post type check) with per-object `edit_post` permission verification to prevent arbitrary post/page overwriting.
+* Security Fix (2026-09-14): Added strict positive integer validation for gallery IDs across all management endpoints to prevent unauthorized option tampering. (Discovered and reported by Seongwon Lee via WPScan & Jetpack, and Justin Willhite).
 
 = 1.1.4 =
 * Handled empty/blank filters dynamically to exclude them from the frontend output gallery, edit image popup, and batch tagging selector.
