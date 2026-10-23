@@ -22,7 +22,7 @@ The **Filter Gallery** plugin makes it simple to create beautiful, organized ima
 
 = Video Tutorials =
 
-https://www.youtube.com/watch?v=tV4AvFGgC2U
+https://www.youtube.com/watch?v=SA65h61wZbk
 
 We designed this plugin to be intuitive and lightweight. You can upload images, assign them to categories (filters), and let your visitors browse your work seamlessly. The gallery automatically adapts to desktops, tablets, and mobile screens, ensuring a perfect viewing experience everywhere.
 
@@ -88,11 +88,14 @@ You can visit our website at [wpfrank.com](https://wpfrank.com/) to purchase the
 
 == Screenshots ==
 
-1.  Animal Gallery: A sample of how the filterable gallery looks on the frontend.
-2.  Art Gallery
-3.  Portrait Gallery
-4.  Sports Gallery Preview
-5.  How to create a filter gallery?
+1.  Filter Gallery: Frontend Preview
+2.  Filter Gallery: Active Filter 'Animals'
+3.  Filter Gallery: Selected Filter 'Nature'
+4.  Filter Gallery: Admin Dashboard
+5.  Filter Gallery: Create Filters
+6.  Filter Gallery: Add Images
+7.  Filter Gallery: Assign Filters to Images
+8.  Filter Gallery: Setting Panel
 
 == Changelog ==
 
